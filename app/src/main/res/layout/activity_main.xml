@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.example.shashank.githubapi.MainActivity"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="@drawable/hero8">
 
 
         <RelativeLayout
@@ -37,7 +38,8 @@
                     android:text="Prev"
                     android:layout_columnWeight="1"
                     android:layout_rowWeight="1"
-                    android:onClick="moveToPreviousPage"/>
+                    android:onClick="moveToPreviousPage"
+                    android:theme="@style/PrimaryFlatButton"/>
 
                 <TextView
                     android:id="@+id/page_num"
@@ -51,7 +53,8 @@
                     android:text="Next"
                     android:layout_columnWeight="1"
                     android:layout_rowWeight="1"
-                    android:onClick="moveToNextPage"/>
+                    android:onClick="moveToNextPage"
+                    android:theme="@style/PrimaryFlatButton"/>
 
 
             </GridLayout>

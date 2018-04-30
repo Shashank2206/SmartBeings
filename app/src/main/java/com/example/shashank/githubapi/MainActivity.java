@@ -30,28 +30,35 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-
-    private List<GitUser> userList = new ArrayList<>();
-    private RecyclerView recyclerView;
+    //The Only Activity that takes care of all the application's functionalities.
+    private List<GitUser> userList = new ArrayList<>(); //The List of User details that is to be used by the recycler view
+    private RecyclerView recyclerView; //A recycler view to be efficient with the display of multiple data points.
     private GridLayout gridLayout;
+
+    //Constants required to construct the GET Request URLs.
     private String BASE_URL = "https://api.github.com/search/users?q=followers:%3E0";
     private String SEARCH_USER = "https://api.github.com/users/";
     private String PER_PAGE = "&per_page=";
     private String PAGE_NUM = "&page=";
+
+    //Variable and Constants to maintain page traversal.
     private int currentPage = 1;
-    private int MAX_PAGE = 50;
-    private int MIN_PAGE = 1;
+    private int MAX_RECORDS = 1000;
     private int NUM_RESULTS_PER_PAGE = 20;
+    private int MAX_PAGE = (int)(MAX_RECORDS / NUM_RESULTS_PER_PAGE); // As GITHUB only allows maximum of 1000 records
+    private int MIN_PAGE = 1;
+
     private SearchView searchView;
     private GitAdapter gitAdapter;
     private TextView pageNumber ;
     private FloatingActionButton search;
-    RequestQueue requestQueue;
+    RequestQueue requestQueue; // In order to queue requests as they pile up and execute them in FIFO.
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         recyclerView = findViewById(R.id.recycler_view);
         gitAdapter = new GitAdapter(userList , R.layout.git_profiles , getApplicationContext());
         requestQueue = Volley.newRequestQueue(this);
@@ -63,10 +70,12 @@ public class MainActivity extends AppCompatActivity {
         gridLayout = findViewById(R.id.page_controller);
         searchView = findViewById(R.id.search_user);
         pageNumber = findViewById(R.id.page_num);
+
+        //Calling the function that handles top user functionality.
         getGithubUsers(1 , NUM_RESULTS_PER_PAGE);
 
 
-
+        //Search query handling.
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -85,6 +94,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void modifyUserList(JSONArray allUsers) throws JSONException {
+        //Handles modification of UserList based on the JSONArray returned in the form of response.
         userList.clear();
         for(int pos = 0 ; pos < allUsers.length() ; pos++){
             String gitUser = allUsers.getJSONObject(pos).get("login").toString();
@@ -95,6 +105,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void getGithubUsers(int pageNum , int perPage){
+        //Handles retrieval of data from github
         String requestURL = BASE_URL + PER_PAGE + Integer.toString(perPage) + PAGE_NUM + Integer.toString(pageNum);
         userList.clear();
         Log.v("getGithubUsers" , requestURL);
@@ -137,6 +148,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void searchGithubForUser(String name){
+        //Handles searching github based on a user handle.
         String requestURL = SEARCH_USER + name;
         JsonObjectRequest arrReq = new JsonObjectRequest(Request.Method.GET, requestURL,
                 new Response.Listener<JSONObject>() {
@@ -177,6 +189,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void moveToNextPage(View view) {
+        //Handles moving the search results to the next page.
         if(currentPage < MAX_PAGE){
             currentPage += 1;
             getGithubUsers(currentPage , NUM_RESULTS_PER_PAGE);
@@ -189,6 +202,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void moveToPreviousPage(View view) {
+        //Handles moving the search results to the previous page.
         if(currentPage > MIN_PAGE){
             currentPage -= 1;
             getGithubUsers(currentPage , NUM_RESULTS_PER_PAGE);
